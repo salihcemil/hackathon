@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { User } from "src/schemas/user.schema";
-import { UserService } from "./user.service";
+import { ApiService } from "./api.service";
 
 @Controller('user')
-export class UserController {
+export class ApiController {
     constructor(
-        private userService: UserService,
+        private userService: ApiService,
     ){}
 
     @Post()

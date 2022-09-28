@@ -9,7 +9,7 @@ import { lastValueFrom, map } from "rxjs";
 
 
 @Injectable()
-export class UserService {
+export class ApiService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
