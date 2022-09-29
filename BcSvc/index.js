@@ -28,13 +28,13 @@ app.post('/api/createRecord/', async (req, res) => {
 app.post('/api/lockFund/', async (req, res) => {
     const paymentId = req.body.paymentId;
     const amountInWei = req.body.amountInWei;
-    const result = await contract.connect(sender).lockFund(paymentId, {value: amountInWei});
-    res.send(result);
+    contract.connect(sender).lockFund(paymentId, {value: amountInWei});
+    res.send("ok");
 });
 
 app.post('/api/releaseFund/', async (req, res) => {
     const paymentId = req.body.paymentId;
-    const result = await contract.releaseFund(paymentId);
+    contract.connect(provider).releaseFund(paymentId);
     res.send("ok");
 });
 
