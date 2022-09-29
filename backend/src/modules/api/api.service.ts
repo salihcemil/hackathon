@@ -63,7 +63,7 @@ export class ApiService {
           )
       );
         const result = await lastValueFrom(
-            this.httpService.post("http://localhost:3010/api/lockFund/", { paymentId }, requestConfig).pipe(
+            this.httpService.post("http://localhost:3010/api/lockFund/", { paymentId, amountInWei: payment.amount }, requestConfig).pipe(
                 map(res => res)
             )
         );
