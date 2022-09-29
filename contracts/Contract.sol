@@ -16,18 +16,18 @@ contract Contract is Ownable {
         bool released;
     }
 
-    mapping(uint256 => transaction) public trxs;
+    mapping(string => transaction) public trxs;
 
     event Recorded(
-        uint256 indexed paymentId,
+        string indexed paymentId,
         address indexed sender,
         address indexed receiver,
         uint256 amountInWei,
         uint256 fiat
     );
-    event Locked(uint256 indexed paymentId, uint256 amountInWei);
+    event Locked(string indexed paymentId, uint256 amountInWei);
     event Released(
-        uint256 indexed paymentId,
+        string indexed paymentId,
         address indexed sender,
         address indexed receiver,
         uint256 amountInWei,
@@ -40,7 +40,7 @@ contract Contract is Ownable {
     }
 
     function createRecord(
-        uint256 _paymentId,
+        string memory _paymentId,
         address _sender,
         address _receiver,
         uint256 _amountInWei,
@@ -74,7 +74,7 @@ contract Contract is Ownable {
         emit Recorded(_paymentId, _sender, _receiver, _amountInWei, _fiat);
     }
 
-    function lockFund(uint256 _paymentId) public payable {
+    function lockFund(string memory _paymentId) public payable {
         require(trxs[_paymentId].amountInWei > 0, "Record not found");
         require(msg.sender == trxs[_paymentId].sender, "Invalid sender");
         require(msg.value == trxs[_paymentId].amountInWei, "Invalid amount");
@@ -93,7 +93,7 @@ contract Contract is Ownable {
         emit Locked(_paymentId, trxs[_paymentId].amountInWei);
     }
 
-    function releaseFund(uint256 _paymentId) public onlyOwner {
+    function releaseFund(string memory _paymentId) public onlyOwner {
         require(trxs[_paymentId].amountInWei > 0, "Record not found");
         require(trxs[_paymentId].locked == true, "Error in transaction status");
         require(
@@ -120,7 +120,7 @@ contract Contract is Ownable {
         return name;
     }
 
-    function getTransactionById(uint256 _paymentId)
+    function getTransactionById(string memory _paymentId)
         public
         view
         returns (transaction memory)
