@@ -12,6 +12,8 @@ const contractABI = require("../artifacts/contracts/Contract.sol/Contract.json")
 const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.API_KEY);//ethers.providers.JsonRpcProvider(process.env.RINKEBY_URL);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractABI.abi, signer);
+const sender = new ethers.Wallet(process.env.PRIVKEY_SENDER, provider);
+
 
 app.post('/api/createRecord/', async (req, res) => {
     const paymentId = req.body.paymentId;
@@ -25,8 +27,9 @@ app.post('/api/createRecord/', async (req, res) => {
 
 app.post('/api/lockFund/', async (req, res) => {
     const paymentId = req.body.paymentId;
-    contract.lockFund(paymentId);
-    res.send("ok");
+    const amountInWei = req.body.amountInWei;
+    const result = await contract.connect(sender).lockFund(paymentId, {value: amountInWei});
+    res.send(result);
 });
 
 app.post('/api/releaseFund/', async (req, res) => {
