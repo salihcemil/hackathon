@@ -19,20 +19,20 @@ app.post('/api/createRecord/', async (req, res) => {
     const receiverAddress = req.body.receiver;
     const wei = req.body.amountInWei;
     const fiat = req.body.fiat;
-    const result = await contract.createRecord(paymentId, senderAddress, receiverAddress, wei, fiat);
-    res.send(result);
+    contract.createRecord(paymentId, senderAddress, receiverAddress, wei, fiat);
+    res.send("ok");
 });
 
 app.post('/api/lockFund/', async (req, res) => {
     const paymentId = req.body.paymentId;
-    const result = await contract.lockFund(paymentId);
-    res.send(result);
+    contract.lockFund(paymentId);
+    res.send("ok");
 });
 
 app.post('/api/releaseFund/', async (req, res) => {
     const paymentId = req.body.paymentId;
     const result = await contract.releaseFund(paymentId);
-    res.send(result);
+    res.send("ok");
 });
 
 app.post('/api/fundPayback/', async (req, res) => {

@@ -49,6 +49,7 @@ export class ApiService {
     //lock funds çağırılacak
     try {
       const payment = await this.paymentModel.findOne({ _id: paymentId }).exec()
+      console.log(payment);
       if(payment.status == 0){
 
         const requestConfig = {
@@ -57,7 +58,7 @@ export class ApiService {
           },
         };
         const resultcreate = await lastValueFrom(
-          this.httpService.post("http://localhost:3010/api/createRecord/", { paymentId,sender: "0xa9226A2cdFF39799a7ff2C8eDE394565b8Bb0EF6",receiver:"0x12CF046B997F185cd644e0fF369C3f19379AB6CF",wei: payment.amount, fiat: (35000*payment.amount) }, requestConfig).pipe(
+          this.httpService.post("http://localhost:3010/api/createRecord/", { paymentId,sender: "0xa9226A2cdFF39799a7ff2C8eDE394565b8Bb0EF6",receiver:"0x12CF046B997F185cd644e0fF369C3f19379AB6CF",amountInWei: payment.amount, fiat: (35000*payment.amount) }, requestConfig).pipe(
               map(res => res)
           )
       );
@@ -107,7 +108,7 @@ export class ApiService {
 
   async getEthPurchaseRequests(): Promise<Payment[]> {
     return this.paymentModel.find({
-      status: 2
+      request_status: 1
     }).exec();
   }
 }
