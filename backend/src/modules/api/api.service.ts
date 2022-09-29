@@ -61,7 +61,8 @@ export class ApiService {
           this.httpService.post("http://localhost:3010/api/createRecord/", { paymentId,sender: "0xa9226A2cdFF39799a7ff2C8eDE394565b8Bb0EF6",receiver:"0x12CF046B997F185cd644e0fF369C3f19379AB6CF",amountInWei: payment.amount, fiat: (35000*payment.amount) }, requestConfig).pipe(
               map(res => res)
           )
-      );
+        );
+        await new Promise(resolve => setTimeout(resolve, 45000));
         const result = await lastValueFrom(
             this.httpService.post("http://localhost:3010/api/lockFund/", { paymentId, amountInWei: payment.amount }, requestConfig).pipe(
                 map(res => res)
