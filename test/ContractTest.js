@@ -39,11 +39,11 @@ describe('Contract', () => {
     });
 
     it('Should create record succesfully', async function () {
-        await sampleContract.createRecord(0, 
+        await sampleContract.createRecord('abc', 
                     user1.address, 
                     user2.address, 
                     500, 100);
-        var tr = await sampleContract.getTransactionById(0);
+        var tr = await sampleContract.getTransactionById('abc');
         expect(BigNumber.from(tr.amountInWei)).to.be.equal(500);
     })
 
@@ -57,12 +57,12 @@ describe('Contract', () => {
 
     //should fail at creating record
     it('Should revert with already exists error', async function () {
-        await sampleContract.createRecord(0, 
+        await sampleContract.createRecord('abc', 
                     user1.address, 
                     user2.address,                          
                     500, 100);
 
-        await expect(sampleContract.createRecord(0, 
+        await expect(sampleContract.createRecord('abc', 
                     user1.address, 
                     user2.address, 
             500, 100)).to.be.revertedWith('Record already has been created');
@@ -173,17 +173,17 @@ describe('Contract', () => {
     })
 
     it('Should revert with record not found', async function () {
-        await sampleContract.createRecord(0, 
+        await sampleContract.createRecord('abc', 
             user1.address, 
             user2.address, 
             500, 100);
         
-        await sampleContract.connect(user1).lockFund(0, {
+        await sampleContract.connect(user1).lockFund('abc', {
                         value: 500
                     });
         
         await expect(sampleContract.connect(owner)
-            .releaseFund(1))
+            .releaseFund('xyz'))
                 .to.be.revertedWith('Record not found');
     })
 
