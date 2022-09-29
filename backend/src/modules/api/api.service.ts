@@ -50,17 +50,24 @@ export class ApiService {
     try {
       const payment = await this.paymentModel.findOne({ _id: paymentId }).exec()
       if(payment.status == 0){
+
         const requestConfig = {
           headers: {
             'Content-Type': 'application/json',
           },
         };
+        const resultcreate = await lastValueFrom(
+          this.httpService.post("http://localhost:3010/api/createRecord/", { paymentId,sender: "0xa9226A2cdFF39799a7ff2C8eDE394565b8Bb0EF6",receiver:"0x12CF046B997F185cd644e0fF369C3f19379AB6CF",wei: payment.amount, fiat: (35000*payment.amount) }, requestConfig).pipe(
+              map(res => res)
+          )
+      );
         const result = await lastValueFrom(
             this.httpService.post("http://localhost:3010/api/lockFund/", { paymentId }, requestConfig).pipe(
                 map(res => res)
             )
         );
-        console.log("result", result); 
+        console.log("result", result);
+        console.log("resultcreate", resultcreate);  
         payment.status = 1;
         payment.request_status = 1;
         await this.paymentModel.findByIdAndUpdate(paymentId, payment).exec();
