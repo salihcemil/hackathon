@@ -13,7 +13,7 @@ export class User {
     full_name: string;
 
     @Prop()
-    longtiude: number;
+    longtitude: number;
 
     @Prop()
     latitude: number;
