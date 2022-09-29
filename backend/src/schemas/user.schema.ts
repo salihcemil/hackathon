@@ -10,10 +10,7 @@ export class User {
     email: string;
 
     @Prop()
-    name: string;
-
-    @Prop()
-    surname: string;
+    full_name: string;
 
     @Prop()
     longtiude: number;

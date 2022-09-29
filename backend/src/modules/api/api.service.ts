@@ -1,6 +1,6 @@
 
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { Payment, PaymentDocument } from 'src/schemas/payment.schema';
@@ -14,21 +14,29 @@ export class ApiService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     private readonly httpService: HttpService,
-
   ) {}
 
   async create(user:User): Promise<User> {
-    const createdCat = new this.userModel(user);
-    return createdCat.save();
+    const createdUser = new this.userModel(user);
+    return createdUser.save();
   }
 
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
 
-  async buyRequest(payment:Payment): Promise<Payment> {
-    const createdPayment = new this.paymentModel(payment);
-    return createdPayment.save();
+  async sendPurchaseRequestByBuyer(payment: Payment): Promise<Payment> {
+    try {
+      await this.userModel.findOne({_id: payment.buyer_id }).exec();
+      await this.userModel.findOne({ id: payment.seller_id, is_buyer: false }).exec();
+      payment.date = new Date(Date.now());
+      payment.status = 0;
+      payment.request_status = 0;
+      const createdPayment = new this.paymentModel(payment);
+      return createdPayment.save();
+      } catch (error) {
+        throw new BadRequestException(error.message);
+      }
   }
 
   async getSellerRequests(): Promise<Payment[]> {
@@ -36,26 +44,32 @@ export class ApiService {
   }
 
   // request_status: 1 --> satıcı kabul etti 2 --> alıcı kabul etti
-
   // satıcı kabul etti
-  async acceptBuyRequest(paymentId:string): Promise<Payment> {
+  async acceptPurchaseRequestBySeller(paymentId:string): Promise<Payment> {
     //lock funds çağırılacak
     try {
-      const requestConfig = {
+      const payment = await this.paymentModel.findOne({ _id: paymentId }).exec()
+      if(payment.status == 0){
+        const requestConfig = {
           headers: {
             'Content-Type': 'application/json',
           },
-      };
-      const result = await lastValueFrom(
-          this.httpService.post("localhost:3010/api/lockFund/", { paymentId}, requestConfig).pipe(
-              map(res => res)
-          )
-      );
-      console.log("result", result); 
+        };
+        const result = await lastValueFrom(
+            this.httpService.post("http://localhost:3010/api/lockFund/", { paymentId }, requestConfig).pipe(
+                map(res => res)
+            )
+        );
+        console.log("result", result); 
+        payment.status = 1;
+        payment.request_status = 1;
+        await this.paymentModel.findByIdAndUpdate(paymentId, payment).exec();
+      }
+       // seller tarafından onaylandı transaction gerçekleşmesi bekleniyor
+      return payment;
     } catch (error) {
-        console.log(error);
+        throw new InternalServerErrorException(error.message);
     }
-    return this.paymentModel.findByIdAndUpdate(paymentId, {request_status: 1, status:1}).exec();
   }
 
   // 
@@ -84,7 +98,7 @@ export class ApiService {
      return null;
   }
 
-  async getMoneyTransferRequests(): Promise<Payment[]> {
+  async getEthPurchaseRequests(): Promise<Payment[]> {
     return this.paymentModel.find({
       status: 2
     }).exec();

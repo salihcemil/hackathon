@@ -6,23 +6,23 @@ export type PaymentDocument = Payment & Document;
 @Schema()
 export class Payment {
 
-    @Prop()
+    @Prop({ required: true })
     buyer_id: string;
 
-    @Prop()
+    @Prop({ required: true })
     seller_id: string;
 
-    @Prop()
+    @Prop({ required: true })
     amount: number;
 
-    @Prop()
+    @Prop({ type: Date, required: true })
     date: Date;
 
     @Prop()
     status: number;
 
     @Prop()
-    request_status: string;
+    request_status: number;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
